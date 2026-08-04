@@ -1,1 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Casa Céramica</title>
+    <!-- Google Fonts pour le style premium -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F9F8F6;
+            color: #1A1A1A;
+            padding: 40px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        .sub {
+            color: #6B6661;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card label {
+            font-weight: 400;
+            font-size: 1.1rem;
+        }
+        .card input {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 1rem;
+            outline: none;
+        }
+        .card input:focus {
+            border-color: #9A5B3E;
+        }
+        .btn-action {
+            width: 100%;
+            background: #1A1A1A;
+            color: #fff;
+            border: none;
+            padding: 14px;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.3s;
+            letter-spacing: 1px;
+            margin-top: 20px;
+        }
+        .btn-action:hover {
+            background: #9A5B3E;
+        }
+        .status {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #2c6e49;
+            display: none;
+        }
+        .status.error { color: #d32f2f; }
+        .back-link {
+            display: block;
+            margin-top: 25px;
+            text-align: center;
+            color: #6B6661;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
 
+    <h1>Gestion des stocks</h1>
+    <div class="sub">Modifie les quantités ci-dessous. Télécharge le fichier JSON et remplace-le sur ton dépôt GitHub.</div>
+
+    <div id="stock-form"></div>
+
+    <button class="btn-action" id="downloadBtn" onclick="generateAndDownload()" style="display:none;">
+        📥 Télécharger le stock.json
+    </button>
+
+    <div id="status" class="status"></div>
+
+    <a href="../index.html" class="back-link">← Retour au site principal</a>
+
+    <script>
+        // Charger le stock depuis le fichier stock.json situé à la racine
+        async function loadStock() {
+            try {
+                const res = await fetch('../stock.json');
+                if (!res.ok) throw new Error('Fichier introuvable');
+                const stock = await res.json();
+                renderForm(stock);
+            } catch (err) {
+                document.getElementById('status').className = 'status error';
+                document.getElementById('status').textContent = '❌ Erreur : ' + err.message;
+            }
+        }
+
+        function renderForm(stock) {
+            const container = document.getElementById('stock-form');
+            let html = '';
+            for (const [product, qty] of Object.entries(stock)) {
+                html += `
+                    <div class="card">
+                        <label for="${product}">${product}</label>
+                        <input type="number" id="${product}" value="${qty}" min="0">
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+            document.getElementById('downloadBtn').style.display = 'block';
+        }
+
+        function generateAndDownload() {
+            const inputs = document.querySelectorAll('#stock-form input');
+            const newStock = {};
+            inputs.forEach(input => {
+                newStock[input.id] = parseInt(input.value, 10) || 0;
+            });
+
+            const json = JSON.stringify(newStock, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'stock.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            document.getElementById('status').className = 'status';
+            document.getElementById('status').textContent = '✅ Fichier téléchargé ! Va sur GitHub et remplace l\'ancien stock.json par celui-ci.';
+            document.getElementById('status').style.display = 'block';
+        }
+
+        loadStock();
+    </script>
+</body>
+</html>
