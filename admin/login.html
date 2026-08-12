@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Admin - Casa Céramica</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #F9F8F6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); max-width: 400px; width: 100%; text-align: center; }
+        h1 { font-weight: 300; letter-spacing: 2px; font-size: 1.8rem; margin-bottom: 10px; }
+        .sub { color: #6B6661; font-size: 0.9rem; margin-bottom: 25px; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; font-size: 0.8rem; color: #6B6661; margin-bottom: 4px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #d6d2cc; border-radius: 8px; outline: none; font-family: inherit; }
+        .form-group input:focus { border-color: #1A1A1A; box-shadow: 0 0 0 3px rgba(26,26,26,0.1); }
+        .btn-login { width: 100%; background: #1A1A1A; color: #fff; border: none; padding: 14px; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: 0.3s; margin-top: 10px; }
+        .btn-login:hover { background: #9A5B3E; transform: scale(1.02); }
+        .error { color: #d32f2f; margin-top: 10px; display: none; font-size: 0.9rem; }
+        .login-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <div class="login-icon">🔐</div>
+        <h1>Accès Admin</h1>
+        <div class="sub">Identifiez-vous pour gérer le site.</div>
+        
+        <div id="errorMessage" class="error">❌ Identifiants incorrects.</div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Identifiant</label>
+                <input type="text" id="username" placeholder="Votre identifiant" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" placeholder="Votre mot de passe" required>
+            </div>
+            <button type="submit" class="btn-login">Se connecter</button>
+        </form>
+    </div>
+
+    <script>
+        // ===== IDENTIFIANTS CONFIGURÉS =====
+        // Identifiant : Casaceramica2026
+        // Mot de passe : Casaceramica2026
+        const ADMIN_USER = "Casaceramica2026";
+        const ADMIN_HASH = "498da6b8b9c38d4f95ef66e5da1bd83923e26387b2a261bc86ea7fd601dfeb9b";
+
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('errorMessage');
+
+            // Vérification de l'identifiant
+            if (username !== ADMIN_USER) {
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            // Vérification du mot de passe (comparaison des hashs)
+            const inputHash = await sha256(password);
+            if (inputHash === ADMIN_HASH) {
+                // Succès : création du jeton de session
+                localStorage.setItem('casaCeramicaAdminAuth', 'true');
+                // Redirection vers le tableau de bord
+                window.location.href = 'index.html';
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
