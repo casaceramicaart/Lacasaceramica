@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casa Céramica | Céramique artisanale – Val da Figueira</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F9F8F6;
+            --text-color: #1A1A1A;
+            --text-muted: #6B6661;
+            --accent-color: #9A5B3E;
+            --accent-hover: #7a462f;
+            --vip-gold: #C49A6C;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            --urgent-color: #d32f2f;
+            --outofstock-color: #888;
+            --shadow-card: 0 2px 20px rgba(0,0,0,0.04);
+            --shadow-hover: 0 8px 40px rgba(0,0,0,0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; overflow-x: hidden; transition: overflow 0.3s; -webkit-font-smoothing: antialiased; }
+        body.no-scroll { overflow: hidden; }
+        
+        /* ===== BANDEAU VIP ===== */
+        .bandeau-custom {
+            position: relative; width: 100%; padding: 8px 15px; text-align: center;
+            font-size: 0.85rem; z-index: 10; display: none;
+            background: var(--vip-gold); color: #1A1A1A; font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .bandeau-custom.show { display: block; animation: slideDown 0.6s ease; }
+        @keyframes slideDown { 0% { opacity: 0; transform: translateY(-10px); } 100% { opacity: 1; transform: translateY(0); } }
+        
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94); will-change: transform, opacity; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+
+        /* ===== HEADER / HERO ===== */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&auto=format&fit=crop') center/cover;
+            background-attachment: fixed; /* effet parallaxe */
+            background-size: cover;
+            padding: 20px;
+            color: #fff;
+        }
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 4.8rem;
+            letter-spacing: 4px;
+            font-weight: 400;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        .hero-subtitle {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: #e0dcd6;
+            letter-spacing: 2px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            font-weight: 300;
+        }
+        .btn-main {
+            background: transparent; color: #fff; padding: 16px 48px;
+            font-size: 1rem; letter-spacing: 3px; text-transform: uppercase;
+            border: 1px solid #fff; transition: all 0.4s; text-decoration: none;
+            position: relative; overflow: hidden;
+        }
+        .btn-main:hover { background: #fff; color: var(--text-color); transform: scale(1.02); box-shadow: 0 0 30px rgba(255,255,255,0.2); }
+
+        .story-section, .testimonials-section, .faq-section, .atelier-section { padding: 100px 20px; max-width: 900px; margin: 0 auto; text-align: center; }
+        .why-section, .trust-section { padding: 80px 20px 120px; max-width: 1200px; margin: 0 auto; text-align: center; }
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: 2.4rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+        .story-text, .trust-text { font-size: 1.15rem; color: var(--text-muted); font-weight: 300; }
+        .story-text strong, .trust-text strong { color: var(--text-color); font-weight: 500; }
+
+        /* ===== AVIS CLIENTS ===== */
+        .testimonials-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px; margin-top: 50px;
+        }
+        .testimonial-item {
+            background: #fff; padding: 30px; border-radius: 12px;
+            box-shadow: var(--shadow-card); text-align: left;
+            transition: transform 0.4s, box-shadow 0.4s;
+        }
+        .testimonial-item:hover { transform: translateY(-8px); box-shadow: var(--shadow-hover); }
+        .testimonial-item .stars { color: var(--accent-color); margin-bottom: 10px; font-size: 1.1rem; letter-spacing: 2px; }
+        .testimonial-item p { font-size: 0.95rem; font-style: italic; color: var(--text-color); margin-bottom: 12px; line-height: 1.6; }
+        .testimonial-item .author { font-size: 0.8rem; color: var(--text-muted); display: block; text-align: right; font-weight: 500; }
+
+        /* ===== FAQ ===== */
+        .faq-list { text-align: left; max-width: 700px; margin: 0 auto; }
+        .faq-item {
+            border-bottom: 1px solid #e0ddd8; padding: 18px 0; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .faq-item:hover { padding-left: 8px; }
+        .faq-question {
+            font-weight: 400; font-size: 1.05rem;
+            display: flex; justify-content: space-between; align-items: center;
+            color: var(--text-color);
+        }
+        .faq-toggle { font-size: 1.5rem; color: var(--accent-color); transition: transform 0.3s; }
+        .faq-answer {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            font-weight: 300; color: var(--text-muted); padding: 0;
+        }
+        .faq-item.open .faq-answer { max-height: 150px; padding-top: 12px; }
+        .faq-item.open .faq-toggle { transform: rotate(45deg); }
+
+        /* ===== POURQUOI ===== */
+        .why-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 40px; margin-top: 50px;
+        }
+        .why-item { text-align: center; padding: 20px; transition: transform 0.4s; }
+        .why-item:hover { transform: translateY(-6px); }
+        .why-icon {
+            display: inline-block; width: 56px; height: 56px; margin-bottom: 15px;
+            color: var(--accent-color); transition: transform 0.4s;
+        }
+        .why-icon svg { width: 100%; height: 100%; stroke: currentColor; stroke-width: 1.5; fill: none; }
+        .why-item:hover .why-icon { transform: scale(1.1) rotate(4deg); }
+        .why-item h4 { font-family: var(--font-heading); font-weight: 400; letter-spacing: 1px; margin-bottom: 8px; font-size: 1.1rem; }
+        .why-item p { font-size: 0.95rem; color: var(--text-muted); font-weight: 300; }
+
+        /* ===== CONFIANCE ===== */
+        .trust-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 30px; margin-top: 50px;
+        }
+        .trust-item {
+            text-align: center; padding: 30px 20px;
+            background: #fff; border-radius: 12px;
+            box-shadow: var(--shadow-card); transition: transform 0.4s, box-shadow 0.4s;
+        }
+        .trust-item:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
+        .trust-icon {
+            display: inline-block; width: 52px; height: 52px; margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+        .trust-icon svg { width: 100%; height: 100%; stroke: currentColor; stroke-width: 1.5; fill: none; }
+        .trust-item h4 { font-family: var(--font-heading); font-weight: 400; letter-spacing: 1px; margin-bottom: 8px; font-size: 1.1rem; }
+        .trust-item p { font-size: 0.95rem; color: var(--text-muted); font-weight: 300; }
+
+        /* ===== ATELIER ===== */
+        .atelier-gallery {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px; margin-top: 40px;
+        }
+        .atelier-gallery img {
+            width: 100%; height: 280px; object-fit: cover;
+            border-radius: 12px; transition: transform 0.5s, box-shadow 0.5s;
+            box-shadow: var(--shadow-card);
+        }
+        .atelier-gallery img:hover { transform: scale(1.02); box-shadow: var(--shadow-hover); }
+        .atelier-text { font-size: 1.05rem; color: var(--text-muted); font-weight: 300; margin-top: 20px; }
+
+        /* ===== COLLECTION ===== */
+        .collection-section { padding: 60px 20px 120px; max-width: 1200px; margin: 0 auto; }
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 50px; margin-top: 60px;
+        }
+        .card {
+            text-align: center; transition: transform 0.5s, box-shadow 0.5s;
+            background: #fff; padding: 25px 25px 35px; border-radius: 16px;
+            box-shadow: var(--shadow-card);
+        }
+        .card:hover {
+            transform: translateY(-10px) scale(1.01);
+            box-shadow: var(--shadow-hover);
+        }
+        .card-img-container {
+            width: 100%; height: 380px; background: #EFECE7; margin-bottom: 20px;
+            overflow: hidden; position: relative; cursor: pointer; border-radius: 12px;
+            touch-action: pan-y;
+        }
+        .carousel { width: 100%; height: 100%; position: relative; overflow: hidden; }
+        .carousel-track {
+            display: flex; width: 100%; height: 100%;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            touch-action: none;
+        }
+        .carousel-slide {
+            flex: 0 0 100%; height: 100%; width: 100%;
+            display: flex; align-items: center; justify-content: center;
+            background: #EFECE7;
+        }
+        .carousel-slide img {
+            max-width: 100%; max-height: 100%; object-fit: contain; display: block;
+            user-select: none; -webkit-user-drag: none;
+        }
+        .carousel-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.85); border: none; border-radius: 50%;
+            width: 38px; height: 38px; cursor: pointer; font-size: 1.2rem;
+            transition: all 0.3s; z-index: 2; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        .carousel-btn:hover { background: #fff; transform: translateY(-50%) scale(1.1); }
+        .carousel-btn.prev { left: 12px; }
+        .carousel-btn.next { right: 12px; }
+        .carousel-dots {
+            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 8px; z-index: 2;
+        }
+        .carousel-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: rgba(255,255,255,0.5); cursor: pointer;
+            transition: all 0.3s; border: 1px solid rgba(0,0,0,0.1);
+        }
+        .carousel-dot.active { background: #fff; transform: scale(1.2); border-color: #fff; }
+
+        /* ===== BADGES ===== */
+        .card-img-container::after {
+            content: 'Édition limitée'; position: absolute; top: 15px; right: 15px; z-index: 3;
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
+            border: 1px solid var(--text-muted); padding: 5px 12px;
+            background: rgba(255,255,255,0.9); border-radius: 30px; color: var(--text-muted);
+        }
+        .stock-badge {
+            position: absolute; bottom: 15px; left: 15px; z-index: 3;
+            font-size: 0.75rem; padding: 6px 16px; border-radius: 30px;
+            letter-spacing: 0.5px; font-weight: 500; transition: all 0.4s;
+            animation: badgeIn 0.5s ease;
+        }
+        @keyframes badgeIn {
+            0% { opacity: 0; transform: scale(0.8) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .stock-badge.disponible { background: var(--accent-color); color: #fff; }
+        .stock-badge.urgent { background: var(--urgent-color); color: #fff; animation: pulse 1.5s infinite, badgeIn 0.5s ease; }
+        .stock-badge.rupture, .stock-badge.bientot { background: var(--outofstock-color); color: #fff; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        .card-title { font-size: 1.7rem; font-weight: 300; margin-bottom: 6px; letter-spacing: 1px; }
+        .card-price { font-size: 1.3rem; color: var(--accent-color); margin-bottom: 15px; font-weight: 500; }
+        .card-sub { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 18px; font-style: italic; }
+        .btn-reserve {
+            width: 100%; background: var(--text-color); color: #fff; border: none;
+            padding: 16px 0; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.3s; border-radius: 8px;
+        }
+        .btn-reserve:hover:not(:disabled) { background: var(--accent-color); transform: scale(1.02); box-shadow: 0 4px 20px rgba(154,91,62,0.3); }
+        .btn-reserve:disabled { background: #ccc; color: #fff; cursor: not-allowed; opacity: 0.6; }
+        .btn-reserve:disabled:hover { transform: none; box-shadow: none; }
+
+        /* ===== PANIER ===== */
+        .cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(6px); opacity: 0; visibility: hidden; transition: all 0.4s; z-index: 999; }
+        .cart-overlay.active { opacity: 1; visibility: visible; }
+        .cart-drawer { position: fixed; top: 0; right: -480px; width: 100%; max-width: 480px; height: 100vh; background: #fff; box-shadow: -10px 0 40px rgba(0,0,0,0.1); transition: right 0.6s cubic-bezier(0.77, 0, 0.175, 1); z-index: 1000; padding: 40px; display: flex; flex-direction: column; }
+        .cart-drawer.active { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e0ddd8; padding-bottom: 20px; margin-bottom: 25px; }
+        .cart-header h2 { font-weight: 300; letter-spacing: 2px; font-size: 1.5rem; text-transform: uppercase; }
+        .close-cart { font-size: 2rem; cursor: pointer; color: var(--text-muted); transition: 0.3s; }
+        .close-cart:hover { color: var(--text-color); transform: rotate(90deg); }
+        .cart-items { flex-grow: 1; overflow-y: auto; margin-bottom: 15px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #f0edea; padding-bottom: 12px; }
+        .cart-item-info { flex: 1; }
+        .cart-item-name { font-size: 1rem; font-weight: 400; }
+        .cart-item-qty { display: flex; align-items: center; gap: 10px; }
+        .cart-item-qty button { background: transparent; border: 1px solid #ccc; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 1rem; transition: 0.2s; color: var(--text-color); }
+        .cart-item-qty button:hover { background: #f0edea; }
+        .cart-item-qty span { min-width: 24px; text-align: center; font-weight: 500; }
+        .cart-footer { border-top: 1px solid #e0ddd8; padding-top: 20px; margin-top: 5px; }
+        .cart-total { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: 500; margin-bottom: 15px; }
+        .cart-info-msg { font-size: 0.85rem; color: var(--text-muted); font-weight: 300; margin-bottom: 15px; line-height: 1.5; }
+        .cart-trust-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin: 15px 0; font-size: 0.8rem; color: var(--text-muted); }
+        .cart-trust-badges span { display: flex; align-items: center; gap: 6px; }
+        .promo-container { margin-bottom: 15px; border-bottom: 1px solid #e0ddd8; padding-bottom: 15px; }
+        .promo-group { display: flex; gap: 10px; }
+        .promo-group input { flex: 1; padding: 10px 14px; border: 1px solid #d6d2cc; border-radius: 8px; background: transparent; outline: none; font-size: 0.95rem; }
+        .promo-group input:focus { border-color: var(--text-color); box-shadow: 0 0 0 3px rgba(26,26,26,0.1); }
+        .promo-group button { background: var(--text-color); color: #fff; border: none; padding: 0 24px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: 500; }
+        .promo-group button:hover { background: var(--accent-color); }
+        .promo-message { display: block; font-size: 0.8rem; margin-top: 8px; font-weight: 300; }
+        .btn-finalize { width: 100%; background: var(--accent-color); color: #fff; border: none; padding: 18px 0; font-size: 1rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.3s; border-radius: 8px; box-shadow: 0 4px 15px rgba(154,91,62,0.25); margin-top: 5px; }
+        .btn-finalize:hover { background: var(--text-color); transform: scale(1.02); box-shadow: 0 6px 25px rgba(26,26,26,0.3); }
+        .btn-finalize.hidden { display: none; }
+
+        /* ===== BOUTON PANIER ===== */
+        #cart-trigger {
+            position: fixed; top: 30px; right: 30px; z-index: 100;
+            background: #1A1A1A; color: #fff; border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 24px; border-radius: 40px; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2); transition: all 0.3s;
+            font-family: inherit; font-size: 0.9rem; backdrop-filter: blur(4px);
+            display: flex; align-items: center; gap: 6px;
+        }
+        #cart-trigger:hover { background: #9A5B3E; transform: scale(1.05); }
+
+        /* ===== LIGHTBOX ===== */
+        .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; cursor: pointer; }
+        .lightbox.active { display: flex; animation: fadeIn 0.4s ease; }
+        .lightbox img { max-width: 92%; max-height: 92%; object-fit: contain; border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        /* ===== TOAST ===== */
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text-color); color: #fff; padding: 16px 32px; border-radius: 12px; box-shadow: 0 4px 30px rgba(0,0,0,0.15); opacity: 0; visibility: hidden; transition: all 0.5s; z-index: 1001; font-size: 0.95rem; text-align: center; }
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+        /* ===== POPUP AJOUT ===== */
+        .add-popup { position: fixed; bottom: 120px; right: 30px; background: #fff; padding: 24px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 1002; max-width: 340px; transform: translateY(20px); opacity: 0; visibility: hidden; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; gap: 12px; }
+        .add-popup.show { transform: translateY(0); opacity: 1; visibility: visible; }
+        .add-popup .popup-header { display: flex; justify-content: space-between; align-items: center; font-weight: 500; font-size: 1.05rem; }
+        .add-popup .popup-header span { color: #2c6e49; }
+        .add-popup .popup-btns { display: flex; gap: 10px; }
+        .add-popup .popup-btns button { flex: 1; padding: 10px 0; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
+        .add-popup .popup-btns .continue { background: #f0edea; color: var(--text-color); }
+        .add-popup .popup-btns .continue:hover { background: #e0ddd8; }
+        .add-popup .popup-btns .view-cart { background: var(--text-color); color: #fff; }
+        .add-popup .popup-btns .view-cart:hover { background: var(--accent-color); }
+
+        /* ===== NEWSLETTER ===== */
+        .newsletter-section { padding: 70px 20px; text-align: center; background: #EFECE7; border-top: 1px solid #e0ddd8; }
+        .newsletter-section h3 { font-family: var(--font-heading); font-weight: 400; font-size: 1.6rem; margin-bottom: 10px; }
+        .newsletter-section p { color: var(--text-muted); margin-bottom: 25px; font-weight: 300; }
+        .newsletter-form { display: flex; justify-content: center; gap: 12px; max-width: 500px; margin: 0 auto; flex-wrap: wrap; }
+        .newsletter-form input { flex: 1; padding: 14px 20px; border: 1px solid #d6d2cc; border-radius: 10px; background: #fff; outline: none; min-width: 200px; font-family: inherit; transition: 0.3s; }
+        .newsletter-form input:focus { border-color: var(--text-color); box-shadow: 0 0 0 3px rgba(26,26,26,0.1); }
+        .newsletter-form button { background: var(--text-color); color: #fff; border: none; padding: 14px 30px; border-radius: 10px; cursor: pointer; transition: 0.3s; font-family: inherit; font-weight: 500; }
+        .newsletter-form button:hover { background: var(--accent-color); transform: scale(1.02); }
+        .newsletter-msg { margin-top: 12px; font-size: 0.9rem; font-weight: 300; }
+
+        /* ===== FOOTER ===== */
+        footer { padding: 60px 20px 30px; background: var(--text-color); color: #e0dcd6; text-align: center; border-top: 1px solid #333; }
+        .footer-brand { font-size: 1.6rem; letter-spacing: 4px; text-transform: uppercase; font-weight: 300; color: #fff; margin-bottom: 20px; }
+        .footer-details { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px 50px; font-size: 0.95rem; font-weight: 300; margin-bottom: 25px; letter-spacing: 0.5px; }
+        .footer-email a { color: #fff; text-decoration: none; border-bottom: 1px solid #666; transition: 0.3s; }
+        .footer-email a:hover { border-bottom-color: #fff; }
+        .footer-links { font-size: 0.85rem; margin: 15px 0; }
+        .footer-links a { color: #b0aba6; text-decoration: none; margin: 0 12px; transition: 0.3s; }
+        .footer-links a:hover { color: #fff; }
+        .footer-copy { font-size: 0.75rem; color: #888; letter-spacing: 1px; margin-top: 15px; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; letter-spacing: 3px; }
+            #cart-trigger { top: 20px; right: 20px; font-size: 0.8rem; padding: 8px 18px; }
+            .grid { grid-template-columns: 1fr; gap: 40px; }
+            .card-img-container { height: 300px; }
+            .carousel-btn { width: 32px; height: 32px; font-size: 0.9rem; }
+            .cart-drawer { padding: 25px 20px; max-width: 100%; }
+            .add-popup { bottom: 80px; right: 20px; max-width: 280px; }
+            .why-grid, .trust-grid { grid-template-columns: 1fr 1fr; }
+            .testimonials-grid, .atelier-gallery { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            h1 { font-size: 2.4rem; }
+            .why-grid, .trust-grid { grid-template-columns: 1fr; }
+            .card-img-container { height: 260px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- BANDEAU VIP -->
+    <div id="bandeauCustom" class="bandeau-custom"></div>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt="Zoom"></div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+    <!-- BOUTON PANIER -->
+    <div id="cart-trigger" onclick="toggleCart()" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false">
+        🛒 <span id="cart-count">0</span>
+    </div>
+
+    <!-- POPUP AJOUT -->
+    <div id="addPopup" class="add-popup">
+        <div class="popup-header"><span>✅ Ajouté au panier</span><span onclick="closePopup()" style="cursor:pointer; font-size:1.2rem;">✕</span></div>
+        <div id="popup-product" style="font-size:0.95rem; color:var(--text-muted);"></div>
+        <div class="popup-btns">
+            <button class="continue" onclick="closePopup()">Continuer</button>
+            <button class="view-cart" onclick="closePopup(); toggleCart();">Voir le panier</button>
+        </div>
+    </div>
+
+    <header>
+        <h1 class="reveal">Casa Céramica</h1>
+        <div class="hero-subtitle reveal reveal-delay-1">
+            Chaque pièce est façonnée entièrement à la main dans notre atelier familial de <strong>Val da Figueira</strong>.<br>
+            Nous fabriquons seulement <strong>quelques exemplaires</strong> de chaque création.
+        </div>
+        <a href="#collection" class="btn-main reveal reveal-delay-2">Voir la collection</a>
+    </header>
+
+    <!-- HISTOIRE -->
+    <section class="story-section reveal">
+        <h2 class="section-title">L'Héritage de la Terre</h2>
+        <p class="story-text">Casa Céramica est né d'une passion familiale. Chaque pièce est <strong>façonnée entièrement à la main</strong>.</p>
+        <p class="story-text">Nous refusons toute production industrielle. Chaque vase est une <strong>édition limitée</strong>, façonnée avec soin.</p>
+    </section>
+
+    <!-- AVIS -->
+    <section id="reviews-section" class="testimonials-section reveal">
+        <h2 class="section-title">Ce qu'ils disent de nous</h2>
+        <div id="dynamicReviews" class="testimonials-grid"></div>
+    </section>
+
+    <!-- POURQUOI -->
+    <section class="why-section reveal">
+        <h2 class="section-title">Pourquoi choisir Casa Céramica ?</h2>
+        <div class="why-grid">
+            <div class="why-item">
+                <div class="why-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+                <h4>Artisanat</h4><p>Chaque geste est fait à la main.</p>
+            </div>
+            <div class="why-item">
+                <div class="why-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+                <h4>Édition limitée</h4><p>Chaque pièce fait partie d'une série très restreinte.</p>
+            </div>
+            <div class="why-item">
+                <div class="why-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
+                <h4>Atelier familial</h4><p>Une histoire qui se transmet.</p>
+            </div>
+            <div class="why-item">
+                <div class="why-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
+                <h4>Livraison en main propre</h4><p>Nous remettons chaque pièce directement.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONFIANCE -->
+    <section class="trust-section reveal">
+        <h2 class="section-title">Confiance & Artisanat Local</h2>
+        <div class="trust-grid">
+            <div class="trust-item">
+                <span class="trust-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></span>
+                <h4>Fait main artisanal</h4>
+                <p>Chaque pièce est façonnée à la main dans notre atelier familial de Val da Figueira.</p>
+            </div>
+            <div class="trust-item">
+                <span class="trust-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polyline points="16 8 20 8 23 11 23 16 16 16 16 8"></polyline><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></span>
+                <h4>Livraison en main propre</h4>
+                <p>Nous livrons personnellement à votre domicile dans tout Val da Figueira.</p>
+            </div>
+            <div class="trust-item">
+                <span class="trust-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>
+                <h4>Point de retrait gratuit</h4>
+                <p>Vous pouvez retirer vos pièces à notre atelier à Val da Figueira, gratuitement.</p>
+            </div>
+            <div class="trust-item">
+                <span class="trust-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
+                <h4>Paiement à la remise</h4>
+                <p>Aucun paiement en ligne. Vous réglez uniquement lors de la remise de votre commande.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ATELIER -->
+    <section class="atelier-section reveal">
+        <h2 class="section-title">Notre atelier</h2>
+        <div class="atelier-gallery">
+            <img src="Photoroom_20260727_100036.jpeg" alt="Boules d'argile brute en séchage" loading="lazy">
+            <img src="CD694D30-FEEB-4AE8-A474-7FCEB6FDDA66.jpeg" alt="Série de pièces en céramique en cours de séchage" loading="lazy">
+            <img src="IMG_5353.jpeg" alt="Détail du travail artisanal et des couleurs" loading="lazy">
+        </div>
+        <div class="atelier-text">
+            Chaque pièce naît dans notre petit atelier de Val da Figueira. De la terre à l'émail, tout est fait à la main, avec passion et précision.
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section reveal">
+        <h2 class="section-title">Questions fréquentes</h2>
+        <div class="faq-list">
+            <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">Comment entretenir mes céramiques ? <span class="faq-toggle">+</span></div><div class="faq-answer">Nos pièces sont peintes et vernies à la main. Elles résistent aux chocs légers. Ne les immergez pas longtemps dans l'eau. Nettoyez avec un chiffon doux.</div></div>
+            <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">Puis-je choisir une couleur différente ? <span class="faq-toggle">+</span></div><div class="faq-answer">Oui, nous travaillons sur des commandes personnalisées. Contactez-nous.</div></div>
+            <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">Quel est votre délai de livraison ? <span class="faq-toggle">+</span></div><div class="faq-answer">Nous vous contactons sous 24h pour convenir d'un créneau. La livraison s'effectue ensuite sous 2 à 6 jours ouvrés.</div></div>
+        </div>
+    </section>
+
+    <!-- BANDEAU (placé avant la collection) -->
+    <div id="bandeauCustom" class="bandeau-custom"></div>
+
+    <!-- COLLECTION -->
+    <section id="collection" class="collection-section">
+        <h2 class="section-title text-center reveal" style="text-align:center;">La Collection</h2>
+        <div class="grid">
+            <!-- PRODUIT 1 -->
+            <div class="card reveal">
+                <div class="card-img-container">
+                    <div class="carousel" data-current-index="0">
+                        <div class="carousel-track">
+                            <div class="carousel-slide"><img src="IMG_5353.jpeg?v=1" alt="Figue 1" loading="lazy"></div>
+                            <div class="carousel-slide"><img src="IMG_5356.jpeg?v=1" alt="Figue 2" loading="lazy"></div>
+                            <div class="carousel-slide"><img src="IMG_5358.jpeg?v=1" alt="Figue 3" loading="lazy"></div>
+                        </div>
+                        <button class="carousel-btn prev" onclick="changeCarouselSlide(this, -1)">❮</button>
+                        <button class="carousel-btn next" onclick="changeCarouselSlide(this, 1)">❯</button>
+                        <div class="carousel-dots"></div>
+                    </div>
+                    <div class="stock-badge disponible" id="badge-Figue">Chargement...</div>
+                </div>
+                <h3 class="card-title">Le Vide Poche Figue</h3>
+                <div class="card-price" content="20">20 €</div>
+                <div class="card-sub">Fabriqué entièrement à la main · Édition limitée</div>
+                <button class="btn-reserve" type="button" id="btn-Figue" onclick="addToCart('Le Vide Poche Figue', 20)">Je le veux</button>
+            </div>
+
+            <!-- PRODUIT 2 -->
+            <div class="card reveal">
+                <div class="card-img-container">
+                    <div class="carousel" data-current-index="0">
+                        <div class="carousel-track">
+                            <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&auto=format&fit=crop&q=80" alt="Grec 1" loading="lazy"></div>
+                            <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&auto=format&fit=crop&q=80" alt="Grec 2" loading="lazy"></div>
+                            <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&auto=format&fit=crop&q=80" alt="Grec 3" loading="lazy"></div>
+                        </div>
+                        <button class="carousel-btn prev" onclick="changeCarouselSlide(this, -1)">❮</button>
+                        <button class="carousel-btn next" onclick="changeCarouselSlide(this, 1)">❯</button>
+                        <div class="carousel-dots"></div>
+                    </div>
+                    <div class="stock-badge disponible" id="badge-Grec">Chargement...</div>
+                </div>
+                <h3 class="card-title">Le Grec</h3>
+                <div class="card-price" content="26">26 €</div>
+                <div class="card-sub">Fabriqué entièrement à la main · Édition limitée</div>
+                <button class="btn-reserve" type="button" id="btn-Grec" onclick="addToCart('Le Grec', 26)">Je le veux</button>
+            </div>
+
+            <!-- PRODUIT 3 -->
+            <div class="card reveal">
+                <div class="card-img-container">
+                    <div class="carousel" data-current-index="0">
+                        <div class="carousel-track">
+                            <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&auto=format&fit=crop&q=80" alt="Emblématique 1" loading="lazy"></div>
+                            <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&auto=format&fit=crop&q=80" alt="Emblématique 2" loading="lazy"></div>
+                            <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&auto=format&fit=crop&q=80" alt="Emblématique 3" loading="lazy"></div>
+                        </div>
+                        <button class="carousel-btn prev" onclick="changeCarouselSlide(this, -1)">❮</button>
+                        <button class="carousel-btn next" onclick="changeCarouselSlide(this, 1)">❯</button>
+                        <div class="carousel-dots"></div>
+                    </div>
+                    <div class="stock-badge disponible" id="badge-Emblématique">Chargement...</div>
+                </div>
+                <h3 class="card-title">L'Emblématique</h3>
+                <div class="card-price" content="30">30 €</div>
+                <div class="card-sub">Fabriqué entièrement à la main · Édition limitée</div>
+                <button class="btn-reserve" type="button" id="btn-Emblématique" onclick="addToCart('L\'Emblématique', 30)">Je le veux</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- PANIER -->
+    <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()" aria-hidden="true"></div>
+    <div class="cart-drawer" id="cart-drawer" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="cart-header"><h2>Votre sélection</h2><span class="close-cart" onclick="toggleCart()">&times;</span></div>
+        <div class="cart-items" id="cart-summary" aria-live="polite"></div>
+        <div class="cart-footer">
+            <div class="promo-container">
+                <div class="promo-group">
+                    <input type="text" id="promoCodeInput" placeholder="Code promo" maxlength="20">
+                    <button onclick="applyPromoCode()">Appliquer</button>
+                </div>
+                <span id="promoMessage" class="promo-message"></span>
+            </div>
+            <div class="cart-total"><span>Total</span><span id="cart-total-price">0 €</span></div>
+            <div class="cart-info-msg"><strong>Nous vous contacterons sous 24 heures</strong> pour organiser la livraison.</div>
+            <div class="cart-trust-badges">
+                <span>🔒 Paiement sécurisé (remise en main propre)</span>
+                <span>🚚 Livraison gratuite</span>
+                <span>🔄 Retour possible sous 14 jours</span>
+            </div>
+            <button class="btn-finalize" id="btn-finalize" onclick="window.location.href='checkout.html'">Finaliser ma demande</button>
+        </div>
+    </div>
+
+    <!-- NEWSLETTER -->
+    <section class="newsletter-section reveal">
+        <h3>Ne manquez pas nos prochaines éditions</h3>
+        <p>Recevez nos alertes sur les futures créations et les rééditions limitées.</p>
+        <form class="newsletter-form" id="newsletterForm" onsubmit="submitNewsletter(event)">
+            <input type="email" id="newsletterEmail" placeholder="Votre adresse email" required>
+            <button type="submit">Je m'abonne</button>
+        </form>
+        <div id="newsletterMsg" class="newsletter-msg"></div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-brand">Casa Céramica</div>
+        <div class="footer-details"><span>Atelier familial</span><span>Val da Figueira</span><span>Livraison en main propre</span><span>Point de retrait</span></div>
+        <div class="footer-email"><a href="mailto:lacasaceramica@protonmail.com">lacasaceramica@protonmail.com</a></div>
+        <div class="footer-links"><a href="admin/">Admin</a> | <a href="#">Mentions légales</a> | <a href="#">Politique de confidentialité</a></div>
+        <div class="footer-copy">Tous droits réservés &copy; 2026 Casa Céramica</div>
+    </footer>
+
+    <script>
+        (function() {
+            'use strict';
+            let cart = []; let isVip = false;
+            const observer = new IntersectionObserver(e => e.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); }), { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+            window.openLightbox = function(container) {
+                const img = container.querySelector('.carousel-slide img');
+                if (img) document.getElementById('lightbox-img').src = img.src;
+                document.getElementById('lightbox').classList.add('active'); document.body.classList.add('no-scroll');
+            };
+            window.closeLightbox = function() {
+                document.getElementById('lightbox').classList.remove('active'); document.body.classList.remove('no-scroll');
+            };
+            window.toggleFaq = function(element) { element.parentElement.classList.toggle('open'); };
+
+            // CARROUSEL
+            function initCarousel(carouselElement) {
+                const track = carouselElement.querySelector('.carousel-track');
+                const slides = track.querySelectorAll('.carousel-slide');
+                const dotsContainer = carouselElement.querySelector('.carousel-dots');
+                let currentIndex = 0;
+                dotsContainer.innerHTML = '';
+                slides.forEach((_, i) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+                    dot.onclick = () => goToSlide(i);
+                    dotsContainer.appendChild(dot);
+                });
+                function goToSlide(index) {
+                    if (index < 0) index = slides.length - 1;
+                    if (index >= slides.length) index = 0;
+                    currentIndex = index;
+                    track.style.transform = `translateX(-${index * 100}%)`;
+                    dotsContainer.querySelectorAll('.carousel-dot').forEach((d, j) => d.classList.toggle('active', j === index));
+                    carouselElement.dataset.currentIndex = index;
+                }
+                function changeSlide(direction) { goToSlide(currentIndex + direction); }
+                carouselElement.changeSlide = changeSlide;
+                let startX = 0; let isDragging = false;
+                carouselElement.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; isDragging = true; }, { passive: true });
+                carouselElement.addEventListener('touchmove', (e) => { if (!isDragging) return; e.preventDefault(); }, { passive: false });
+                carouselElement.addEventListener('touchend', (e) => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    const endX = e.changedTouches[0].clientX;
+                    const diff = startX - endX;
+                    if (Math.abs(diff) > 50) { if (diff > 0) changeSlide(1); else changeSlide(-1); }
+                }, { passive: true });
+            }
+            document.querySelectorAll('.carousel').forEach(carousel => { initCarousel(carousel); });
+            window.changeCarouselSlide = function(btn, direction) {
+                const carousel = btn.closest('.carousel');
+                if (carousel && carousel.changeSlide) { carousel.changeSlide(direction); }
+            };
+
+            // LIGHTBOX
+            document.querySelectorAll('.card-img-container').forEach(container => {
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.carousel-btn') || e.target.closest('.carousel-dot')) return;
+                    const carousel = this.querySelector('.carousel');
+                    if (carousel) {
+                        const index = parseInt(carousel.dataset.currentIndex) || 0;
+                        const slides = carousel.querySelectorAll('.carousel-slide');
+                        if (slides[index]) {
+                            const img = slides[index].querySelector('img');
+                            if (img) { document.getElementById('lightbox-img').src = img.src; document.getElementById('lightbox').classList.add('active'); document.body.classList.add('no-scroll'); }
+                        }
+                    }
+                });
+            });
+
+            // AVIS
+            function loadReviews() {
+                const reviews = JSON.parse(localStorage.getItem('casaCeramicaReviews')) || [];
+                const container = document.getElementById('dynamicReviews');
+                if(reviews.length === 0) { container.innerHTML = '<p style="color:#888; font-style:italic;">Soyez le premier à laisser un avis !</p>'; return; }
+                let html = '';
+                reviews.forEach(r => { html += `<div class="testimonial-item"><div class="stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><p>"${r.text}"</p><span class="author">– ${r.author}</span></div>`; });
+                container.innerHTML = html;
+            }
+            loadReviews();
+
+            // VISITES
+            let visits = JSON.parse(localStorage.getItem('casaCeramicaVisits')) || { today: 0, date: new Date().toDateString() };
+            if(visits.date !== new Date().toDateString()) { visits = { today: 0, date: new Date().toDateString() }; }
+            visits.today += 1; localStorage.setItem('casaCeramicaVisits', JSON.stringify(visits));
+
+            // NEWSLETTER
+            window.submitNewsletter = async function(e) {
+                e.preventDefault();
+                const email = document.getElementById('newsletterEmail').value.trim();
+                const msg = document.getElementById('newsletterMsg');
+                if(!email) return;
+                const endpointUrl = 'https://formspree.io/f/yourNewsletterFormID'; 
+                try {
+                    const response = await fetch(endpointUrl, { method: 'POST', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email }) });
+                    if(response.ok) { msg.className = 'newsletter-msg success'; msg.textContent = '✅ Merci ! Vous recevrez nos prochaines annonces.'; document.getElementById('newsletterEmail').value = ''; } 
+                    else { throw new Error('Erreur'); }
+                } catch (err) {
+                    window.location.href = `mailto:lacasaceramica@protonmail.com?subject=Inscription Newsletter&body=Email: ${email}`;
+                    msg.className = 'newsletter-msg success'; msg.textContent = '✅ Inscription enregistrée (via email).';
+                }
+            };
+
+            // PANIER
+            function loadCart() {
+                const stored = localStorage.getItem('casaCeramicaCart');
+                if (stored) { try { cart = JSON.parse(stored).map(i => ({...i, quantity: parseInt(i.quantity,10)||0})).filter(i => i.quantity > 0); } catch(e) { cart = []; } }
+                updateCartUI();
+            }
+            function saveCart() { localStorage.setItem('casaCeramicaCart', JSON.stringify(cart)); }
+            
+            window.addToCart = function(name, price) {
+                const e = cart.find(i => i.name === name); if (e) e.quantity = (parseInt(e.quantity,10)||0) + 1; else cart.push({ name, price, quantity: 1 });
+                saveCart(); updateCartUI(); showAddPopup(name);
+            };
+            
+            window.changeQty = function(name, delta) {
+                const item = cart.find(i => i.name === name); if (!item) return;
+                let q = parseInt(item.quantity,10)||0; q += delta;
+                if (q <= 0) cart = cart.filter(i => i.name !== name); else item.quantity = q;
+                saveCart(); updateCartUI();
+            };
+            window.toggleCart = function() {
+                const d = document.getElementById('cart-drawer'), o = document.getElementById('cart-overlay'), t = document.getElementById('cart-trigger');
+                const a = d.classList.toggle('active'); o.classList.toggle('active'); t.setAttribute('aria-expanded', a);
+                document.body.classList.toggle('no-scroll', a);
+            };
+
+            // PROMO
+            window.applyPromoCode = function() {
+                const input = document.getElementById('promoCodeInput');
+                const msg = document.getElementById('promoMessage');
+                const code = input.value.trim().toUpperCase();
+                const promos = JSON.parse(localStorage.getItem('casaCeramicaPromos')) || [];
+                const found = promos.find(p => p.code === code);
+
+                if (found) {
+                    const now = new Date();
+                    if (found.expiry && new Date(found.expiry) < now) {
+                        msg.className = 'promo-message error';
+                        msg.textContent = '❌ Ce code promo est expiré.';
+                        return;
+                    }
+                    if (found.maxUses && found.uses >= found.maxUses) {
+                        msg.className = 'promo-message error';
+                        msg.textContent = '❌ Ce code promo a atteint son nombre maximal d\'utilisations.';
+                        return;
+                    }
+                    isVip = true;
+                    found.uses = (found.uses || 0) + 1;
+                    localStorage.setItem('casaCeramicaPromos', JSON.stringify(promos));
+                    msg.className = 'promo-message success';
+                    msg.textContent = `✅ Code appliqué ! -${found.value}%`;
+                    updateProductDisplays(found.value);
+                    updateCartUI(found.value);
+                    showToast(`🎉 Réduction de ${found.value}% activée !`);
+                } else if (code === '') {
+                    isVip = false; msg.className = 'promo-message'; msg.textContent = ''; updateProductDisplays(0); updateCartUI(0);
+                } else {
+                    isVip = false; msg.className = 'promo-message error'; msg.textContent = '❌ Code promo invalide.'; updateProductDisplays(0); updateCartUI(0);
+                }
+            };
+
+            function updateProductDisplays(discountPercent = 0) {
+                document.querySelectorAll('.card').forEach(card => {
+                    const priceEl = card.querySelector('.card-price');
+                    const originalPrice = parseFloat(priceEl.getAttribute('content'));
+                    if (originalPrice) {
+                        if (discountPercent > 0) {
+                            const disc = originalPrice * (1 - discountPercent / 100);
+                            priceEl.innerHTML = `<span style="text-decoration:line-through;color:#999;font-size:0.9rem;">${originalPrice} €</span><br><span style="color:var(--accent-color);font-weight:500;">${disc.toFixed(0)} €</span>`;
+                        } else { priceEl.textContent = originalPrice + ' €'; }
+                    }
+                });
+            }
+
+            function updateCartUI(discountPercent = 0) {
+                document.getElementById('cart-count').innerText = cart.reduce((a,i) => a + (parseInt(i.quantity,10)||0), 0);
+                const s = document.getElementById('cart-summary'), t = document.getElementById('cart-total-price');
+                const multiplier = discountPercent > 0 ? (1 - discountPercent / 100) : 1;
+                s.innerHTML = ''; let total = 0, orig = 0;
+                if (cart.length === 0) { s.innerHTML = '<p style="color:#888;font-style:italic;">Votre sélection est vide.</p>'; }
+                else {
+                    cart.forEach(item => {
+                        const q = parseInt(item.quantity,10)||0; const u = item.price; const d = u * multiplier;
+                        orig += u * q; total += d * q;
+                        const row = document.createElement('div'); row.className = 'cart-item';
+                        row.innerHTML = `<div class="cart-item-info"><div class="cart-item-name">${item.name}</div><div style="color:var(--accent-color);font-size:0.9rem;">${multiplier !== 1 ? `<span style="text-decoration:line-through;color:#999;font-size:0.8rem;">${u} €</span> ${d.toFixed(0)} €` : u + ' €'}</div></div><div class="cart-item-qty"><button onclick="changeQty('${item.name}', -1)">−</button><span>${q}</span><button onclick="changeQty('${item.name}', 1)">+</button></div>`;
+                        s.appendChild(row);
+                    });
+                }
+                t.innerHTML = multiplier !== 1 && cart.length > 0 ? `<span style="text-decoration:line-through;color:#999;margin-right:10px;font-size:1rem;">${orig.toFixed(0)} €</span><span style="font-weight:bold;">${total.toFixed(0)} €</span>` : total + ' €';
+            }
+
+            function showToast(msg, d=2800) {
+                const tt = document.getElementById('toast'); tt.textContent = msg; tt.classList.add('show');
+                clearTimeout(tt._timeout); tt._timeout = setTimeout(() => tt.classList.remove('show'), d);
+            }
+            window.showToast = showToast;
+
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') { if (document.getElementById('cart-drawer').classList.contains('active')) toggleCart(); if (document.getElementById('lightbox').classList.contains('active')) closeLightbox(); }
+            });
+
+            let popupTimer;
+            function showAddPopup(productName) {
+                const popup = document.getElementById('addPopup');
+                document.getElementById('popup-product').textContent = productName;
+                popup.classList.add('show');
+                clearTimeout(popupTimer);
+                popupTimer = setTimeout(() => popup.classList.remove('show'), 5000);
+            }
+            window.closePopup = function() { document.getElementById('addPopup').classList.remove('show'); };
+
+            // STOCK AVEC STATUTS (disponible, rupture, bientot)
+            async function loadStock() {
+                try {
+                    const res = await fetch('stock.json');
+                    if (!res.ok) throw new Error('Erreur');
+                    const stock = await res.json();
+                    const updateBadge = (id, name, btnId) => {
+                        const badge = document.getElementById(id);
+                        const btn = document.getElementById(btnId);
+                        const data = stock[name];
+                        if (badge && btn) {
+                            let quantity = typeof data === 'object' ? data.quantity : data;
+                            let status = typeof data === 'object' ? data.status : 'disponible';
+
+                            if (status === 'rupture') {
+                                badge.className = 'stock-badge rupture';
+                                badge.textContent = 'Rupture de stock';
+                                btn.disabled = true;
+                                btn.textContent = 'Bientôt disponible';
+                            } else if (status === 'bientot') {
+                                badge.className = 'stock-badge bientot';
+                                badge.textContent = 'Bientôt disponible';
+                                btn.disabled = true;
+                                btn.textContent = 'Bientôt disponible';
+                            } else if (quantity <= 3) {
+                                badge.className = 'stock-badge urgent';
+                                badge.textContent = '⚠️ Dernières pièces !';
+                                btn.disabled = false;
+                                btn.textContent = 'Je le veux';
+                            } else {
+                                badge.className = 'stock-badge disponible';
+                                badge.textContent = quantity + ' exemplaires disponibles';
+                                btn.disabled = false;
+                                btn.textContent = 'Je le veux';
+                            }
+                        }
+                    };
+                    updateBadge('badge-Figue', 'Le Vide Poche Figue', 'btn-Figue');
+                    updateBadge('badge-Grec', 'Le Grec', 'btn-Grec');
+                    updateBadge('badge-Emblématique', 'L\'Emblématique', 'btn-Emblématique');
+                } catch (err) {
+                    document.getElementById('badge-Figue').textContent = 'Quantité limitée';
+                    document.getElementById('badge-Grec').textContent = 'Quantité limitée';
+                    document.getElementById('badge-Emblématique').textContent = 'Quantité limitée';
+                }
+            }
+
+            loadCart(); loadStock();
+            
+            if (window.location.search.includes('ref=vip20')) {
+                const promoInput = document.getElementById('promoCodeInput');
+                if (promoInput) {
+                    promoInput.value = 'VIP20';
+                    const promos = JSON.parse(localStorage.getItem('casaCeramicaPromos')) || [];
+                    if (!promos.find(p => p.code === 'VIP20')) {
+                        promos.push({ code: 'VIP20', value: 20 });
+                        localStorage.setItem('casaCeramicaPromos', JSON.stringify(promos));
+                    }
+                    applyPromoCode();
+                }
+                document.getElementById('bandeauCustom').className = 'bandeau-custom show';
+                document.getElementById('bandeauCustom').textContent = '🎉 Bienvenue ! Profitez de -20% sur tous les articles.';
+                document.body.classList.add('bandeau-active');
+            }
+        })();
+    </script>
+</body>
+</html>
