@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation de commande – Casa Céramica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F9F8F6;
+            --text-color: #1A1A1A;
+            --text-muted: #6B6661;
+            --accent-color: #9A5B3E;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; padding: 20px; }
+        .confirmation-container { max-width: 600px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); text-align: center; }
+        h1 { font-family: var(--font-heading); font-weight: 400; font-size: 2rem; margin-bottom: 10px; }
+        .order-number { font-size: 1.5rem; color: var(--accent-color); font-weight: 500; margin-bottom: 20px; }
+        .summary-box { background: #F9F8F6; padding: 20px; border-radius: 6px; text-align: left; margin: 20px 0; }
+        .summary-box h3 { font-weight: 400; margin-bottom: 10px; }
+        .summary-box .item { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.95rem; }
+        .summary-box .total { font-weight: 600; font-size: 1.1rem; margin-top: 10px; border-top: 1px solid #ddd; padding-top: 10px; }
+        .btn-back { display: inline-block; margin-top: 20px; background: var(--text-color); color: #fff; padding: 12px 30px; border-radius: 4px; text-decoration: none; transition: 0.3s; }
+        .btn-back:hover { background: var(--accent-color); }
+        .info-text { font-size: 0.9rem; color: var(--text-muted); margin-top: 20px; }
+        @media (max-width: 480px) { .confirmation-container { padding: 20px; } }
+    </style>
+</head>
+<body>
+    <div class="confirmation-container">
+        <h1>🎉 Merci pour votre commande !</h1>
+        <div class="order-number" id="orderNumber">Numéro de commande : <span id="orderNumberSpan"></span></div>
+        <p style="color: var(--text-muted);">Nous vous contacterons sous 24 heures pour organiser la livraison ou le retrait.</p>
+        
+        <div class="summary-box" id="summaryBox">
+            <h3>Récapitulatif de votre commande</h3>
+            <div id="itemsList"></div>
+            <div class="total" id="totalAmount">Total : <span id="totalSpan"></span></div>
+        </div>
+
+        <a href="index.html" class="btn-back">← Retour à la boutique</a>
+        <div class="info-text">Un email de confirmation vous a été envoyé.</div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+            // Récupérer la dernière commande stockée
+            const lastOrder = JSON.parse(localStorage.getItem('casaCeramicaLastOrder'));
+            if (lastOrder) {
+                document.getElementById('orderNumberSpan').textContent = lastOrder.orderNumber;
+                // Afficher les articles
+                const itemsHtml = lastOrder.items.split('\n').filter(line => line.trim() !== '').map(line => {
+                    return `<div class="item"><span>${line}</span></div>`;
+                }).join('');
+                document.getElementById('itemsList').innerHTML = itemsHtml;
+                document.getElementById('totalSpan').textContent = lastOrder.total;
+            } else {
+                document.getElementById('orderNumberSpan').textContent = '—';
+                document.getElementById('itemsList').innerHTML = '<p>Aucune commande trouvée.</p>';
+                document.getElementById('totalSpan').textContent = '0 €';
+            }
+        })();
+    </script>
+</body>
+</html>
