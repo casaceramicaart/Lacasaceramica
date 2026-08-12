@@ -1,0 +1,14 @@
+{
+  "Le Vide Poche Figue": {
+    "quantity": 15,
+    "status": "disponible"
+  },
+  "Le Grec": {
+    "quantity": 4,
+    "status": "disponible"
+  },
+  "L'Emblématique": {
+    "quantity": 2,
+    "status": "bientot"
+  }
+}
