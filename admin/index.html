@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Casa Céramica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #F9F8F6; color: #1A1A1A; padding: 30px 20px; max-width: 1200px; margin: 0 auto; }
+        h1 { font-weight: 300; letter-spacing: 2px; margin-bottom: 5px; }
+        .sub { color: #6B6661; font-size: 0.9rem; margin-bottom: 30px; }
+        .tabs { display: flex; gap: 10px; border-bottom: 1px solid #e0ddd8; margin-bottom: 25px; padding-bottom: 10px; flex-wrap: wrap; }
+        .tab-btn { background: transparent; border: none; padding: 10px 20px; cursor: pointer; font-size: 1rem; color: #6B6661; transition: 0.3s; border-radius: 4px; }
+        .tab-btn:hover { background: #EFECE7; }
+        .tab-btn.active { background: #1A1A1A; color: #fff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); text-align: center; }
+        .stat-card h3 { font-weight: 300; font-size: 0.9rem; color: #6B6661; margin-bottom: 5px; }
+        .stat-card .number { font-size: 2rem; font-weight: 500; color: #1A1A1A; }
+        .item-list { background: #fff; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden; margin-bottom: 20px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #f0edea; flex-wrap: wrap; gap: 10px; }
+        .item-row:last-child { border-bottom: none; }
+        .item-info { flex: 1; min-width: 200px; }
+        .item-info .name { font-weight: 500; }
+        .item-info .details { font-size: 0.85rem; color: #6B6661; }
+        .form-group { margin-bottom: 15px; display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+        .form-group label { display: block; font-size: 0.75rem; color: #6B6661; margin-bottom: 4px; }
+        .form-group input, .form-group select { padding: 8px 12px; border: 1px solid #d6d2cc; border-radius: 4px; background: #fff; outline: none; font-family: inherit; font-size: 0.95rem; }
+        .form-group input:focus { border-color: #1A1A1A; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; transition: 0.3s; color: #fff; }
+        .btn-primary { background: #1A1A1A; }
+        .btn-primary:hover { background: #9A5B3E; }
+        .btn-danger { background: #d32f2f; }
+        .btn-danger:hover { background: #b71c1c; }
+        .btn-success { background: #2c6e49; }
+        .btn-success:hover { background: #1f5236; }
+        .btn-outline { background: transparent; border: 1px solid #ccc; color: #1A1A1A; }
+        .btn-outline:hover { background: #EFECE7; }
+        @media (max-width: 600px) { .form-group { flex-direction: column; align-items: stretch; } .form-group input { width: 100%; } }
+    </style>
+</head>
+<body>
+    <h1>Tableau de bord</h1>
+    <div class="sub">Gérez vos commandes, stocks, codes promo, avis clients.</div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+        <button class="tab-btn" onclick="switchTab('orders')">📦 Commandes</button>
+        <button class="tab-btn" onclick="switchTab('promos')">🏷️ Codes Promo</button>
+        <button class="tab-btn" onclick="switchTab('reviews')">⭐ Avis Clients</button>
+        <button class="tab-btn" onclick="switchTab('stock')">📦 Gestion Stock</button>
+    </div>
+
+    <!-- 1. DASHBOARD -->
+    <div id="dashboard" class="tab-content active">
+        <div class="dashboard-grid">
+            <div class="stat-card"><h3>Commandes totales</h3><div class="number" id="totalOrders">0</div></div>
+            <div class="stat-card"><h3>Chiffre d'affaires</h3><div class="number" id="totalRevenue">0 €</div></div>
+            <div class="stat-card"><h3>En attente</h3><div class="number" id="pendingOrders">0</div></div>
+            <div class="stat-card"><h3>Produit phare</h3><div class="number" id="topProduct" style="font-size:1.2rem;">-</div></div>
+            <div class="stat-card"><h3>Visites aujourd'hui</h3><div class="number" id="visitsToday">0</div></div>
+        </div>
+        <h2 style="font-weight:300; letter-spacing:1px; margin-bottom:15px;">Commandes récentes</h2>
+        <div id="recentOrdersList" class="item-list"></div>
+    </div>
+
+    <!-- 2. COMMANDES -->
+    <div id="orders" class="tab-content">
+        <div class="filter-bar">
+            <select id="statusFilter" onchange="renderOrders()">
+                <option value="all">Toutes les commandes</option>
+                <option value="En attente">En attente</option>
+                <option value="Traitée">Traitée</option>
+            </select>
+        </div>
+        <div id="ordersList" class="item-list"></div>
+    </div>
+
+    <!-- 3. CODES PROMO (version avancée) -->
+    <div id="promos" class="tab-content">
+        <div class="form-group">
+            <div><label>Code</label><input type="text" id="newPromoCode" placeholder="ex: BIENVENUE"></div>
+            <div><label>Réduction (%)</label><input type="number" id="newPromoValue" placeholder="ex: 10" min="1" max="100"></div>
+            <div><label>Date d'expiration (facultatif)</label><input type="date" id="newPromoExpiry"></div>
+            <div><label>Utilisations max</label><input type="number" id="newPromoUses" placeholder="ex: 50" min="1"></div>
+            <button class="btn btn-primary" onclick="addPromoCode()">Ajouter le code</button>
+        </div>
+        <div id="promosList" class="item-list"></div>
+    </div>
+
+    <!-- 4. AVIS CLIENTS -->
+    <div id="reviews" class="tab-content">
+        <div class="form-group">
+            <div><label>Nom du client</label><input type="text" id="newReviewAuthor" placeholder="ex: Sophie M."></div>
+            <div><label>Note</label>
+                <select id="newReviewStars"><option value="5">5 ★</option><option value="4">4 ★</option><option value="3">3 ★</option><option value="2">2 ★</option><option value="1">1 ★</option></select>
+            </div>
+            <div style="flex:1;"><label>Texte de l'avis</label><input type="text" id="newReviewText" placeholder="ex: Une pièce magnifique..." style="width:100%;"></div>
+            <button class="btn btn-primary" onclick="addReview()">Ajouter l'avis</button>
+        </div>
+        <div id="reviewsList" class="item-list"></div>
+    </div>
+
+    <!-- 5. GESTION STOCK (avec statuts) -->
+    <div id="stock" class="tab-content">
+        <p style="color:#6B6661; font-size:0.9rem; margin-bottom:15px;">Modifiez les quantités et les statuts ci-dessous, puis cliquez sur <strong>"Télécharger le stock.json"</strong> et remplacez le fichier sur GitHub.</p>
+        <div id="stockFormContainer"></div>
+        <button class="btn download-btn" id="downloadStockBtn" onclick="downloadStockJSON()" style="display:none; margin-top:15px;">📥 Télécharger le stock.json</button>
+        <a href="../index.html" style="display:inline-block; margin-top:20px; color:#6B6661; text-decoration:none;">← Retour au site</a>
+    </div>
+
+    <script>
+        // Utilitaires
+        function getData(key, defaultVal) { try { return JSON.parse(localStorage.getItem(key)) || defaultVal; } catch(e) { return defaultVal; } }
+        function setData(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.tab-btn[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            if(tabId === 'dashboard') renderDashboard();
+            if(tabId === 'orders') renderOrders();
+            if(tabId === 'promos') renderPromos();
+            if(tabId === 'reviews') renderReviews();
+        }
+        window.switchTab = switchTab;
+
+        // DASHBOARD
+        function renderDashboard() {
+            let orders = getData('casaCeramicaOrders', []);
+            let visits = getData('casaCeramicaVisits', { today: 0, date: new Date().toDateString() });
+            if(visits.date !== new Date().toDateString()) { visits = { today: 0, date: new Date().toDateString() }; setData('casaCeramicaVisits', visits); }
+            let total = 0, pending = 0, productCount = {};
+            orders.forEach(o => {
+                total += parseFloat(o.total.replace(' €', ''));
+                if(o.status === 'En attente') pending++;
+                let items = o.items.split('\n').filter(line => line.includes('x'));
+                items.forEach(line => {
+                    let parts = line.split(' x');
+                    if(parts.length === 2) {
+                        let name = parts[0].trim();
+                        let qty = parseInt(parts[1].split(' ')[0]) || 1;
+                        productCount[name] = (productCount[name] || 0) + qty;
+                    }
+                });
+            });
+            document.getElementById('totalOrders').textContent = orders.length;
+            document.getElementById('totalRevenue').textContent = total.toFixed(0) + ' €';
+            document.getElementById('pendingOrders').textContent = pending;
+            document.getElementById('visitsToday').textContent = visits.today;
+            let topProduct = '-';
+            if(Object.keys(productCount).length > 0) topProduct = Object.keys(productCount).reduce((a, b) => productCount[a] > productCount[b] ? a : b);
+            document.getElementById('topProduct').textContent = topProduct;
+            
+            let recent = [...orders].reverse().slice(0, 5);
+            let html = '';
+            if(recent.length === 0) html = '<div class="item-row" style="color:#888; justify-content:center;">Aucune commande.</div>';
+            recent.forEach(o => {
+                html += `<div class="item-row"><div class="item-info"><div class="name">${o.name}</div><div class="details">${o.date} · Total ${o.total}</div></div><span style="font-size:0.8rem; background:#EFECE7; padding:4px 12px; border-radius:20px;">${o.status}</span></div>`;
+            });
+            document.getElementById('recentOrdersList').innerHTML = html;
+        }
+
+        // COMMANDES
+        function renderOrders() {
+            let orders = getData('casaCeramicaOrders', []);
+            let filter = document.getElementById('statusFilter').value;
+            let filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter);
+            let html = '';
+            if(filtered.length === 0) html = '<div class="item-row" style="color:#888; justify-content:center;">Aucune commande.</div>';
+            filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+            filtered.forEach((o, index) => {
+                let realIndex = orders.indexOf(o);
+                html += `<div class="item-row">
+                    <div class="item-info"><div class="name">${o.name}</div><div class="details">📞 ${o.contact}<br>📍 ${o.address || 'Non spécifié'}<br>🕐 ${o.timeslot || 'Flexible'}<br>📝 ${o.notes || '-'}<br><div style="margin-top:5px;">${o.items.replace(/\n/g, '<br>')}<br><strong>Total: ${o.total}</strong></div></div></div>
+                    <div style="display:flex; gap:10px; align-items:center;"><span style="background:#EFECE7; padding:4px 12px; border-radius:20px; font-size:0.8rem;">${o.status}</span>${o.status === 'En attente' ? `<button class="btn btn-success" onclick="markOrderDone(${realIndex})">Marquer traitée</button>` : ''}<button class="btn btn-danger" onclick="deleteOrder(${realIndex})">Supprimer</button></div>
+                </div>`;
+            });
+            document.getElementById('ordersList').innerHTML = html;
+        }
+        window.renderOrders = renderOrders;
+        function markOrderDone(index) { let orders = getData('casaCeramicaOrders', []); if(orders[index]) { orders[index].status = 'Traitée'; setData('casaCeramicaOrders', orders); renderOrders(); renderDashboard(); } }
+        function deleteOrder(index) { if(!confirm('Supprimer cette commande ?')) return; let orders = getData('casaCeramicaOrders', []); orders.splice(index, 1); setData('casaCeramicaOrders', orders); renderOrders(); renderDashboard(); }
+
+        // CODES PROMO AVANCÉS
+        function renderPromos() {
+            let promos = getData('casaCeramicaPromos', []);
+            let html = '';
+            if(promos.length === 0) html = '<div class="item-row" style="color:#888; justify-content:center;">Aucun code promo.</div>';
+            const now = new Date();
+            promos.forEach((p, i) => {
+                let status = '✅ Actif';
+                if (p.expiry && new Date(p.expiry) < now) status = '⛔ Expiré';
+                if (p.uses && p.uses >= (p.maxUses || 999)) status = '⛔ Utilisation max atteinte';
+                html += `<div class="item-row"><div class="item-info"><div class="name">${p.code} (${p.value}%)</div><div class="details">Expiration: ${p.expiry || 'Jamais'} · Utilisations: ${p.uses || 0}/${p.maxUses || '∞'} · ${status}</div></div><button class="btn btn-danger" onclick="deletePromo(${i})">Supprimer</button></div>`;
+            });
+            document.getElementById('promosList').innerHTML = html;
+        }
+        window.renderPromos = renderPromos;
+        function addPromoCode() {
+            let code = document.getElementById('newPromoCode').value.trim().toUpperCase();
+            let value = parseInt(document.getElementById('newPromoValue').value);
+            let expiry = document.getElementById('newPromoExpiry').value || null;
+            let maxUses = parseInt(document.getElementById('newPromoUses').value) || 999;
+            if(!code || !value || value < 1) return alert('Code et % obligatoires.');
+            let promos = getData('casaCeramicaPromos', []);
+            if(promos.find(p => p.code === code)) return alert('Ce code existe déjà.');
+            promos.push({ code, value, expiry, maxUses, uses: 0 });
+            setData('casaCeramicaPromos', promos);
+            document.getElementById('newPromoCode').value = ''; document.getElementById('newPromoValue').value = '';
+            document.getElementById('newPromoExpiry').value = ''; document.getElementById('newPromoUses').value = '';
+            renderPromos(); alert('✅ Code "' + code + '" ajouté !');
+        }
+        function deletePromo(index) { if(!confirm('Supprimer ce code ?')) return; let promos = getData('casaCeramicaPromos', []); promos.splice(index, 1); setData('casaCeramicaPromos', promos); renderPromos(); }
+
+        // AVIS
+        function renderReviews() {
+            let reviews = getData('casaCeramicaReviews', []);
+            let html = '';
+            if(reviews.length === 0) html = '<div class="item-row" style="color:#888; justify-content:center;">Aucun avis.</div>';
+            reviews.forEach((r, i) => { html += `<div class="item-row"><div class="item-info"><div class="name">${r.author} <span style="color:#9A5B3E;">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</span></div><div class="details">"${r.text}"</div></div><button class="btn btn-danger" onclick="deleteReview(${i})">Supprimer</button></div>`; });
+            document.getElementById('reviewsList').innerHTML = html;
+        }
+        window.renderReviews = renderReviews;
+        function addReview() { let author = document.getElementById('newReviewAuthor').value.trim(); let stars = parseInt(document.getElementById('newReviewStars').value); let text = document.getElementById('newReviewText').value.trim(); if(!author || !text) return alert('Remplir nom et texte.'); let reviews = getData('casaCeramicaReviews', []); reviews.push({ author, stars, text }); setData('casaCeramicaReviews', reviews); document.getElementById('newReviewAuthor').value = ''; document.getElementById('newReviewText').value = ''; renderReviews(); alert('✅ Avis ajouté !'); }
+        function deleteReview(index) { if(!confirm('Supprimer cet avis ?')) return; let reviews = getData('casaCeramicaReviews', []); reviews.splice(index, 1); setData('casaCeramicaReviews', reviews); renderReviews(); }
+
+        // GESTION STOCK (avec statuts)
+        async function loadStockAdmin() {
+            try {
+                const res = await fetch('../stock.json');
+                if (!res.ok) throw new Error();
+                const stock = await res.json();
+                renderStockForm(stock);
+            } catch (err) {
+                document.getElementById('stockFormContainer').innerHTML = '<p style="color:#d32f2f;">Erreur lors du chargement du fichier stock.json</p>';
+            }
+        }
+        function renderStockForm(stock) {
+            let html = '';
+            for (const [product, data] of Object.entries(stock)) {
+                // data peut être un objet { quantity, status } ou un simple nombre (pour compatibilité)
+                let quantity = typeof data === 'object' ? data.quantity : data;
+                let status = typeof data === 'object' ? data.status : 'disponible';
+                html += `
+                    <div class="form-group" style="justify-content:space-between; background:#fff; padding:10px; border-radius:4px; border:1px solid #f0edea;">
+                        <label style="font-weight:400; font-size:1rem; margin:0;">${product}</label>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <input type="number" id="stock_${product}" value="${quantity}" min="0" style="width:60px; padding:8px;">
+                            <select id="status_${product}">
+                                <option value="disponible" ${status === 'disponible' ? 'selected' : ''}>Disponible</option>
+                                <option value="rupture" ${status === 'rupture' ? 'selected' : ''}>Rupture de stock</option>
+                                <option value="bientot" ${status === 'bientot' ? 'selected' : ''}>Bientôt disponible</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }
+            document.getElementById('stockFormContainer').innerHTML = html;
+            document.getElementById('downloadStockBtn').style.display = 'block';
+        }
+        window.loadStockAdmin = loadStockAdmin;
+        
+        function downloadStockJSON() {
+            const inputs = document.querySelectorAll('#stockFormContainer input[type="number"]');
+            const selects = document.querySelectorAll('#stockFormContainer select');
+            const newStock = {};
+            inputs.forEach((input, index) => {
+                const productName = input.id.replace('stock_', '');
+                const quantity = parseInt(input.value, 10) || 0;
+                const status = selects[index].value;
+                newStock[productName] = { quantity, status };
+            });
+            const jsonString = JSON.stringify(newStock, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'stock.json';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('✅ Fichier téléchargé ! Remplacez-le sur GitHub.');
+        }
+        window.downloadStockJSON = downloadStockJSON;
+
+        // INIT
+        loadStockAdmin();
+        renderDashboard();
+    </script>
+</body>
+</html>
